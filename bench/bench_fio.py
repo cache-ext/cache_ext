@@ -79,7 +79,8 @@ class FioBenchmark(BenchmarkFramework):
         self.cache_ext_policy = CacheExtPolicy(
             DEFAULT_CACHE_EXT_CGROUP, self.args.policy_loader, target_dir
         )
-        CLEANUP_TASKS.append(lambda: self.cache_ext_policy.stop())
+        if self.args.policy_loader:
+            CLEANUP_TASKS.append(lambda: self.cache_ext_policy.stop())
         target_file = os.path.join(target_dir, "fio_benchfile")
         ensure_random_file(target_file)
 
@@ -90,16 +91,16 @@ class FioBenchmark(BenchmarkFramework):
         parser.add_argument(
             "--policy-loader",
             type=str,
-            default="./cache_ext_mglru.out",
-            help="Specify the path to the policy loader binary",
+            default="",
+            help="Specify the path to the policy loader binary. If empty, no policy will be used.",
         )
 
     def generate_configs(self, configs: List[Dict]) -> List[Dict]:
         configs = add_config_option("iteration", list(range(1, self.args.iterations + 1)), configs)
         configs = add_config_option("workload", ["randread"], configs)
         configs = add_config_option("runtime_seconds", [60], configs)
-        configs = add_config_option("nr_threads", [4], configs)
-        configs = add_config_option("cgroup_size", [5 * GiB], configs)
+        configs = add_config_option("nr_threads", [8], configs)
+        configs = add_config_option("cgroup_size", [5 * GiB, 10 * GiB, 30 * GiB], configs)
         if self.args.default_only:
             configs = add_config_option(
                 "cgroup_name", [DEFAULT_BASELINE_CGROUP], configs
@@ -129,7 +130,7 @@ class FioBenchmark(BenchmarkFramework):
             policy_loader_name = os.path.basename(self.cache_ext_policy.loader_path)
             if policy_loader_name == "cache_ext_s3fifo.out":
                 self.cache_ext_policy.start(cgroup_size=config["cgroup_size"])
-            else:
+            elif policy_loader_name:
                 self.cache_ext_policy.start()
         else:
             recreate_baseline_cgroup(limit_in_bytes=config["cgroup_size"])
@@ -164,7 +165,7 @@ class FioBenchmark(BenchmarkFramework):
     def after_benchmark(self, config):
         log.info("Stopping CPU usage measurement")
         self.cpu_usage = sum(psutil.cpu_percent(percpu=True)[: config["cpus"]])
-        if config["cgroup_name"] == DEFAULT_CACHE_EXT_CGROUP:
+        if config["cgroup_name"] == DEFAULT_CACHE_EXT_CGROUP and self.cache_ext_policy.loader_path:
             self.cache_ext_policy.stop()
         log.info("Deleting cgroup %s", config["cgroup_name"])
         delete_cgroup(config["cgroup_name"])
