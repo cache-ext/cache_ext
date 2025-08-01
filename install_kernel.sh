@@ -44,6 +44,15 @@ echo "Building and installing libbpf..."
 make -C tools/lib/bpf -j
 sudo make -C tools/lib/bpf install
 
+# Add ld.so.conf.d entry for libbpf
+if [[ ! -e /etc/ld.so.conf.d/libbpf.conf ]]; then
+	echo "/usr/local/lib64" | sudo tee /etc/ld.so.conf.d/libbpf.conf > /dev/null
+	sudo ldconfig
+	echo "Added /usr/local/lib64 to /etc/ld.so.conf.d/libbpf.conf"
+else
+	echo "/usr/local/lib64 already exists in /etc/ld.so.conf.d/libbpf.conf"
+fi
+
 echo "Building and install bpftool..."
 make -C tools/bpf/bpftool -j
 # Default location:
