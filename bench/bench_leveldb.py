@@ -119,7 +119,7 @@ class LevelDBBenchmark(BenchmarkFramework):
         parser.add_argument(
             "--leveldb-db",
             type=str,
-            default="/mydata/leveldb_db",
+            required=True,
             help="Specify the directory to watch for cache_ext",
         )
         parser.add_argument(
@@ -131,25 +131,26 @@ class LevelDBBenchmark(BenchmarkFramework):
         parser.add_argument(
             "--policy-loader",
             type=str,
-            default="./cache_ext_sampling.out",
+            required=True,
             help="Specify the path to the policy loader binary",
         )
         parser.add_argument(
             "--bench-binary-dir",
             type=str,
-            default="/mydata/My-YCSB/build",
+            required=True,
             help="Specify the directory containing the benchmark binary",
         )
         parser.add_argument(
             "--benchmark",
             type=str,
-            default="ycsb_a,ycsb_c",
+            required=True,
+            help="Specify the benchmark to run, e.g., 'ycsb_a,ycsb_b,'",
         )
         parser.add_argument(
             "--fadvise-hints",
             type=str,
-            default=",SEQUENTIAL,NOREUSE,DONTNEED",
-            help="Specify the fadvise hints to use for the baseline cgroup",
+            default="",
+            help="Specify the fadvise hints to use for the baseline cgroup, e.g., 'SEQUENTIAL,NOREUSE,DONTNEED'",
         )
 
     def generate_configs(self, configs: List[Dict]) -> List[Dict]:
