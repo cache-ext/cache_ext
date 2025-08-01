@@ -20,11 +20,11 @@ ITERATIONS=1
 
 POLICIES=(
 	"cache_ext_lhd"
-	# "cache_ext_s3fifo"
-	# "cache_ext_sampling"
-	# "cache_ext_fifo"
-	# "cache_ext_mru"
-	# "cache_ext_mglru"
+	"cache_ext_s3fifo"
+	"cache_ext_sampling"
+	"cache_ext_fifo"
+	"cache_ext_mru"
+	"cache_ext_mglru"
 )
 
 mkdir -p "$RESULTS_PATH"
