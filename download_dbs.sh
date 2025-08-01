@@ -37,6 +37,10 @@ echo "Downloading LevelDB database..."
 rclone copy --progress --transfers 64 --checkers 64 b2:leveldb "${DB_PATH}/leveldb/"
 rclone check --progress --transfers 64 --checkers 64 b2:leveldb "${DB_PATH}/leveldb/"
 
+echo "Downloading Twitter trace metadata..."
+rclone copy --progress --transfers 64 --checkers 64 b2:twitter-traces "${DB_PATH}/twitter-traces/"
+rclone check --progress --transfers 64 --checkers 64 b2:twitter-traces "${DB_PATH}/twitter-traces/"
+
 for cluster in 17 18 24 34 52; do
     echo "Downloading LevelDB Twitter cluster $cluster database..."
     rclone copy --progress --transfers 64 --checkers 64 b2:leveldb-twitter-cluster${cluster}-db "${DB_PATH}/leveldb_twitter_cluster${cluster}_db/"

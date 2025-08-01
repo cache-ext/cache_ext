@@ -161,7 +161,7 @@ class LevelDBTwitterTraceBenchmark(BenchmarkFramework):
         parser.add_argument(
             "--leveldb-db",
             type=str,
-            default="/mydata/leveldb_db",
+            required=True,
             help="Specify the directory to watch for cache_ext",
         )
         parser.add_argument(
@@ -173,19 +173,26 @@ class LevelDBTwitterTraceBenchmark(BenchmarkFramework):
         parser.add_argument(
             "--policy-loader",
             type=str,
-            default="./cache_ext_sampling.out",
+            required=True,
             help="Specify the path to the policy loader binary",
         )
         parser.add_argument(
             "--bench-binary-dir",
             type=str,
-            default="/mydata/My-YCSB/build",
+            required=True,
             help="Specify the directory containing the benchmark binary",
         )
         parser.add_argument(
             "--benchmark",
             type=str,
-            default="twitter_cluster_17_bench",
+            required=True,
+            help="Specify the benchmark to run, e.g., twitter_cluster_17_bench",
+        )
+        parser.add_argument(
+            "--twitter-traces-dir",
+            type=str,
+            required=True,
+            help="Specify the directory containing Twitter trace metadata files",
         )
 
     def generate_configs(self, configs: List[Dict]) -> List[Dict]:
@@ -224,9 +231,15 @@ class LevelDBTwitterTraceBenchmark(BenchmarkFramework):
         bench_binary_dir = self.args.bench_binary_dir
         bench_file = "../leveldb/config/%s.yaml" % config["benchmark"]
         bench_file = os.path.abspath(os.path.join(bench_binary_dir, bench_file))
-        with open(bench_file, "r") as f:
-            bench_config = yaml.load(f)
-        trace_file = bench_config["workload"]["trace_file"]
+        
+        # Extract cluster number from benchmark name and construct trace file path
+        cluster_match = re.search(r'cluster(\d+)', config["benchmark"])
+        if cluster_match:
+            cluster_num = cluster_match.group(1)
+            trace_file = os.path.join(self.args.twitter_traces_dir, f"cluster{cluster_num}_bench.txt")
+        else:
+            raise Exception("Could not extract cluster number from benchmark name: %s" % config["benchmark"])
+            
         trace_file_size = file_size(trace_file)
         # Load the trace file in memory to charge it to another cgroup
         cmd = ["cat", trace_file]
@@ -260,12 +273,22 @@ class LevelDBTwitterTraceBenchmark(BenchmarkFramework):
         bench_file = os.path.abspath(os.path.join(bench_binary_dir, bench_file))
         if not os.path.exists(bench_file):
             raise Exception("Benchmark file not found: %s" % bench_file)
+        
+        # Extract cluster number from benchmark name (e.g., "twitter_cluster_17_bench" -> "17")
+        cluster_match = re.search(r'cluster(\d+)', config["benchmark"])
+        if cluster_match:
+            cluster_num = cluster_match.group(1)
+            trace_file_path = os.path.join(self.args.twitter_traces_dir, f"cluster{cluster_num}_bench.txt")
+        else:
+            raise Exception("Could not extract cluster number from benchmark name: %s" % config["benchmark"])
+            
         with edit_yaml_file(bench_file) as bench_config:
             bench_config["leveldb"]["data_dir"] = leveldb_temp_db_dir
             bench_config["workload"]["runtime_seconds"] = config["runtime_seconds"]
             bench_config["workload"]["warmup_runtime_seconds"] = config[
                 "warmup_runtime_seconds"
             ]
+            bench_config["workload"]["trace_file"] = trace_file_path
         cmd = [
             "sudo",
             "cgexec",
