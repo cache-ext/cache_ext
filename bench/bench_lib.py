@@ -277,7 +277,6 @@ def save_json(path: str, data):
         json.dump(data, f, indent=4)
     os.rename(tmp_path, path)
 
-# Helerp
 
 ##########################
 # Benchmarking framework #

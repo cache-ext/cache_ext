@@ -150,7 +150,7 @@ class LevelDBBenchmark(BenchmarkFramework):
             "--fadvise-hints",
             type=str,
             default="",
-            help="Specify the fadvise hints to use for the baseline cgroup, e.g., 'SEQUENTIAL,NOREUSE,DONTNEED'",
+            help="Specify the fadvise hints to use for the baseline cgroup, e.g., ',SEQUENTIAL,NOREUSE,DONTNEED'",
         )
 
     def generate_configs(self, configs: List[Dict]) -> List[Dict]:
