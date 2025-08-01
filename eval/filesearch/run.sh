@@ -11,6 +11,7 @@ fi
 SCRIPT_PATH=$(realpath $0)
 BASE_DIR=$(realpath "$(dirname $SCRIPT_PATH)/../../")
 BENCH_PATH="$BASE_DIR/bench"
+POLICY_PATH="$BASE_DIR/policies"
 FILES_PATH=$(realpath "$BASE_DIR/../linux")
 RESULTS_PATH="$BASE_DIR/results"
 
@@ -27,7 +28,7 @@ fi
 # Baseline and cache_ext
 python3 "$BENCH_PATH/bench_filesearch.py" \
 	--cpu 8 \
-	--policy-loader "$BASE_DIR/policies/cache_ext_mru.out" \
+	--policy-loader "$POLICY_PATH/cache_ext_mru.out" \
 	--results-file "$RESULTS_PATH/filesearch_results.json" \
 	--data-dir "$FILES_PATH" \
 	--iterations "$ITERATIONS"
@@ -52,3 +53,5 @@ if ! "$BASE_DIR/utils/disable-mglru.sh"; then
 	echo "Failed to disable MGLRU. Please check the script."
 	exit 1
 fi
+
+echo "File search benchmark completed. Results saved to $RESULTS_PATH."
