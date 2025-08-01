@@ -4,9 +4,7 @@ CLANG ?= clang-14
 BPFTOOL ?= /usr/local/sbin/bpftool #../../tools/bpf/bpftool/bpftool
 CFLAGS = -O2 -target bpf -D__TARGET_ARCH_$(ARCH) -c -g -Wall
 USERSPACE_CFLAGS = -O2 -fsanitize=address -g -Wall
-USERSPACE_LINKER_FLAGS =  -L../../tools/lib/bpf -lbpf #-L/usr/local/lib64 -lbpf
-
-# -L/../../tools/lib/bpf
+USERSPACE_LINKER_FLAGS = -L/usr/local/lib64 -lbpf
 
 # Define the BPF program source and the output object file
 BPF_SRC = cache_ext_simple.bpf.c cache_ext_mru.bpf.c cache_ext_mglru.bpf.c
