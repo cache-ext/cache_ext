@@ -23,13 +23,13 @@ class FileSearchBenchmark(BenchmarkFramework):
         parser.add_argument(
             "--data-dir",
             type=str,
-            default="/mydata/filesearch_data",
+            required=True,
             help="Data directory",
         )
         parser.add_argument(
             "--policy-loader",
             type=str,
-            default="./cache_ext_mru.out",
+            required=True,
             help="Specify the path to the policy loader binary",
         )
 
