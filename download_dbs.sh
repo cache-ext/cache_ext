@@ -16,19 +16,19 @@ echo "Configuring rclone B2 backend..."
 RCLONE_CONFIG_FILE=$(rclone config file | tail -n 1)
 
 if ! rclone config show b2 &>/dev/null; then
-    read -p "Enter your B2 Account ID: " B2_ACCOUNT_ID
-    read -s -p "Enter your B2 Account Key: " B2_ACCOUNT_KEY
-    echo
+	read -p "Enter your B2 Account ID: " B2_ACCOUNT_ID
+	read -s -p "Enter your B2 Account Key: " B2_ACCOUNT_KEY
+	echo
 
-    # Manually append the config entry to the rclone config file
-    cat <<EOF >> "$RCLONE_CONFIG_FILE"
+	# Manually append the config entry to the rclone config file
+	cat <<EOF >> "$RCLONE_CONFIG_FILE"
 [b2]
 type = b2
 account = $B2_ACCOUNT_ID
 key = $B2_ACCOUNT_KEY
 EOF
 else
-    echo "B2 config already present in $RCLONE_CONFIG_FILE, skipping configuration."
+	echo "B2 config already present in $RCLONE_CONFIG_FILE, skipping configuration."
 fi
 
 echo "Downloading databases from B2..."
@@ -42,7 +42,7 @@ rclone copy --progress --transfers 64 --checkers 64 b2:twitter-traces "${DB_PATH
 rclone check --progress --transfers 64 --checkers 64 b2:twitter-traces "${DB_PATH}/twitter-traces/"
 
 for cluster in 17 18 24 34 52; do
-    echo "Downloading LevelDB Twitter cluster $cluster database..."
-    rclone copy --progress --transfers 64 --checkers 64 b2:leveldb-twitter-cluster${cluster}-db "${DB_PATH}/leveldb_twitter_cluster${cluster}_db/"
-    rclone check --progress --transfers 64 --checkers 64 b2:leveldb-twitter-cluster${cluster}-db "${DB_PATH}/leveldb_twitter_cluster${cluster}_db/"
+	echo "Downloading LevelDB Twitter cluster $cluster database..."
+	rclone copy --progress --transfers 64 --checkers 64 b2:leveldb-twitter-cluster${cluster}-db "${DB_PATH}/leveldb_twitter_cluster${cluster}_db/"
+	rclone check --progress --transfers 64 --checkers 64 b2:leveldb-twitter-cluster${cluster}-db "${DB_PATH}/leveldb_twitter_cluster${cluster}_db/"
 done
