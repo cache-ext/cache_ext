@@ -82,8 +82,11 @@ Then, you can build and install the other components:
 ./install_leveldb.sh
 ./install_misc.sh
 ./install_ycsb.sh
+./setup_isolation.sh
 ./build_policies.sh
 ```
+
+Note that this will require approximately 500GB of disk space.
 
 ## Running experiments
 
