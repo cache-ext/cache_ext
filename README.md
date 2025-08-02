@@ -103,9 +103,13 @@ by modifying the `ITERATIONS` variable in each `run.sh` script.
 The results will be saved in a top-level `results` directory as JSON files.
 
 Many of the experiments will take several hours to run due to the number of
-configurations, policies, and iterations. We recommend using the `screen`
-command to start a persistent session that can run the command in the
+configurations, policies, and iterations. For example, by default, the YCSB
+benchmark will take **approximately 20 hours** to run. We recommend using the
+`screen` command to start a persistent session that can run the command in the
 background and avoid losing progress if the SSH connection is interrupted.
+
+To exit a `screen` session, you can press <kbd>Ctrl</kbd> + <kbd>A</kbd>
+followed by <kbd>Ctrl</kbd> + <kbd>D</kbd>.
 
 ## Plotting results
 
