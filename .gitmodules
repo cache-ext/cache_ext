@@ -1,12 +1,12 @@
 [submodule "linux"]
 	path = linux
-	url = git@github.com:cache-ext/linux-cache-ext.git
+	url = https://github.com/cache-ext/linux-cache-ext.git
 [submodule "leveldb"]
 	path = leveldb
-	url = git@github.com:cache-ext/leveldb.git
+	url = https://github.com/cache-ext/leveldb.git
 [submodule "My-YCSB"]
 	path = My-YCSB
-	url = git@github.com:xrp-project/My-YCSB.git
+	url = https://github.com/xrp-project/My-YCSB.git
 [submodule "rocksdb"]
 	path = rocksdb
-	url = git@github.com:cache-ext/rocksdb.git
+	url = https://github.com/cache-ext/linux-cache-ext.git
