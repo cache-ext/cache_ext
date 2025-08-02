@@ -42,7 +42,7 @@ fi
 # MGLRU
 python3 "$BENCH_PATH/bench_filesearch.py" \
 	--cpu 8 \
-	--policy-loader "$BASE_DIR/policies/cache_ext_mru.out" \
+	--policy-loader "$POLICY_PATH/cache_ext_mru.out" \
 	--results-file "$RESULTS_PATH/filesearch_results_mglru.json" \
 	--data-dir "$FILES_PATH" \
 	--iterations "$ITERATIONS" \
