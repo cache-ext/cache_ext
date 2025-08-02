@@ -1,4 +1,4 @@
-# cache_ext: Custom Page Cache Eviction Policies with eBPF 
+# cache_ext: Custom Page Cache Eviction Policies with eBPF
 
 This repository contains source code and scripts for reproducing key results
 from the cache_ext paper (to appear in SOSP 2025) for the purposes of artifact
@@ -20,7 +20,7 @@ tools with no modifications, such as fio and ripgrep.
 
 ## Repository Structure
 
-```
+```text
 cache_ext
 |-- policies/                   : eBPF page cache eviction policies
 |-- bench/                      : Benchmarking framework

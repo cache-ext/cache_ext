@@ -12,5 +12,6 @@ policies:
 It corresponds to Figure 7 in the paper.
 
 Outputs, where CLUSTER is one of (17 18 24 34 52):
+
 - `results/twitter_traces_${CLUSTER}_results.json` (for baseline and cache_ext)
 - `results/twitter_traces_${CLUSTER}_results_mglru.json` (for MGLRU)
