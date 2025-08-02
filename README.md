@@ -106,3 +106,20 @@ Many of the experiments will take several hours to run due to the number of
 configurations, policies, and iterations. We recommend using the `screen`
 command to start a persistent session that can run the command in the
 background and avoid losing progress if the SSH connection is interrupted.
+
+## Plotting results
+
+We include a Jupyter notebook `bench/bench_plot.ipynb` that can be used to plot
+the results of the experiments. You can run this notebook in a Jupyter
+environment (i.e., Jupyter Notebook or VSCode).
+
+For example, to start up a Jupyter server, you can run:
+
+```sh
+cd /mydata/cache_ext/bench
+jupyter notebook
+```
+
+This will start a Jupyter server and open a web interface in your browser.
+You can then open the `bench_plot.ipynb` notebook and run the cells to generate
+the plots.
