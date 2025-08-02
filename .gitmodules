@@ -9,4 +9,4 @@
 	url = https://github.com/xrp-project/My-YCSB.git
 [submodule "rocksdb"]
 	path = rocksdb
-	url = https://github.com/cache-ext/linux-cache-ext.git
+	url = https://github.com/cache-ext/rocksdb.git
