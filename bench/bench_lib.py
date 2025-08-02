@@ -29,7 +29,7 @@ class CacheExtPolicy:
         self.has_started = False
         self._policy_thread = None
 
-    def start(self, cgroup_size: int=0):
+    def start(self, cgroup_size: int = 0):
         if self.has_started:
             raise Exception("Policy already started")
         self.has_started = True
@@ -85,6 +85,7 @@ def ulimit(num_open_files: int):
         log.error(f"Unexpected error while setting ulimit: {e}")
         raise e
 
+
 def format_bytes_str(bytes: int):
     if bytes < 1024:
         return f"{bytes} B"
@@ -109,14 +110,14 @@ def edit_yaml_file(file_path):
     yaml.preserve_quotes = True
 
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             data = yaml.load(file)
     except FileNotFoundError:
         data = {}
 
     yield data
 
-    with open(file_path, 'w') as file:
+    with open(file_path, "w") as file:
         yaml.dump(data, file)
 
 
@@ -127,7 +128,7 @@ def run_command_with_live_output(command, **kwargs):
         "stderr": subprocess.PIPE,
         "text": True,
         "bufsize": 1,
-        "universal_newlines": True
+        "universal_newlines": True,
     }
 
     # Update with any user-provided kwargs
@@ -144,7 +145,9 @@ def run_command_with_live_output(command, **kwargs):
             os.set_blocking(pipe.fileno(), False)
 
     while True:
-        ready_to_read, _, _ = select.select([process.stdout, process.stderr], [], [], 0.1)
+        ready_to_read, _, _ = select.select(
+            [process.stdout, process.stderr], [], [], 0.1
+        )
 
         for pipe in ready_to_read:
             if pipe == process.stdout:
@@ -166,18 +169,25 @@ def run_command_with_live_output(command, **kwargs):
         if pipe:
             remaining_output = pipe.read()
             if remaining_output:
-                print(remaining_output.strip(), file=sys.stderr if pipe == process.stderr else sys.stdout)
-                (stderr_output if pipe == process.stderr else stdout_output).append(remaining_output)
+                print(
+                    remaining_output.strip(),
+                    file=sys.stderr if pipe == process.stderr else sys.stdout,
+                )
+                (stderr_output if pipe == process.stderr else stdout_output).append(
+                    remaining_output
+                )
 
     if process.returncode != 0:
-        raise subprocess.CalledProcessError(process.returncode, command, ''.join(stdout_output), ''.join(stderr_output))
+        raise subprocess.CalledProcessError(
+            process.returncode, command, "".join(stdout_output), "".join(stderr_output)
+        )
 
-    return ''.join(stdout_output)
+    return "".join(stdout_output)
 
 
 def run(cmd, *args, **kwargs):
     # Set check=True
-    kwargs['check'] = True
+    kwargs["check"] = True
     log.info("Running command: %s" % cmd)
     return subprocess.run(cmd, *args, **kwargs)
 
@@ -209,16 +219,20 @@ def delete_cgroup(cgroup):
         run(["sudo", "cgdelete", f"memory:{cgroup}"])
 
 
-def recreate_cache_ext_cgroup(cgroup=DEFAULT_CACHE_EXT_CGROUP,
-                              limit_in_bytes=2*GiB):
+def recreate_cache_ext_cgroup(cgroup=DEFAULT_CACHE_EXT_CGROUP, limit_in_bytes=2 * GiB):
     delete_cgroup(cgroup)
     # Create cache_ext cgroup
     run(["sudo", "cgcreate", "-g", f"memory:{cgroup}"])
 
     # Set memory limit for cache_ext cgroup
-    run(["sudo", "sh", "-c",
-         "echo %d > /sys/fs/cgroup/%s/memory.max"
-         % (limit_in_bytes, cgroup)])
+    run(
+        [
+            "sudo",
+            "sh",
+            "-c",
+            "echo %d > /sys/fs/cgroup/%s/memory.max" % (limit_in_bytes, cgroup),
+        ]
+    )
 
     log.info(
         "cache_ext cgroup %s created with limit %s",
@@ -227,15 +241,20 @@ def recreate_cache_ext_cgroup(cgroup=DEFAULT_CACHE_EXT_CGROUP,
     )
 
 
-def recreate_baseline_cgroup(cgroup=DEFAULT_BASELINE_CGROUP,
-                             limit_in_bytes=2*GiB):
+def recreate_baseline_cgroup(cgroup=DEFAULT_BASELINE_CGROUP, limit_in_bytes=2 * GiB):
     delete_cgroup(cgroup)
     # Create baseline cgroup
     run(["sudo", "cgcreate", "-g", f"memory:{cgroup}"])
 
     # Set memory limit for baseline cgroup
-    run(["sudo", "sh", "-c",
-         "echo %d > /sys/fs/cgroup/%s/memory.max" % (limit_in_bytes, cgroup)])
+    run(
+        [
+            "sudo",
+            "sh",
+            "-c",
+            "echo %d > /sys/fs/cgroup/%s/memory.max" % (limit_in_bytes, cgroup),
+        ]
+    )
 
 
 def drop_page_cache():
@@ -323,7 +342,9 @@ class BenchRun:
 def parse_results_file(results_file: str, benchresults_cls) -> BenchRun:
     with open(results_file, "r") as f:
         results = json.load(f)
-    return [BenchRun(r["config"], benchresults_cls.from_json(r["results"])) for r in results]
+    return [
+        BenchRun(r["config"], benchresults_cls.from_json(r["results"])) for r in results
+    ]
 
 
 def exists_config_in_results(results: List[BenchRun], config: Dict) -> bool:
@@ -335,16 +356,17 @@ def exists_config_in_results(results: List[BenchRun], config: Dict) -> bool:
 
 def results_select(results: List[BenchRun], config_match: Dict) -> List[BenchRun]:
     # Select results based on partial config match
-    return [r for r in results
-            if config_match.items() <= r.config.items()]
+    return [r for r in results if config_match.items() <= r.config.items()]
+
 
 def single_result_select(results: List[BenchRun], config_match: Dict) -> BenchRun:
     # Select results based on partial config match
-    matches = [r for r in results
-               if config_match.items() <= r.config.items()]
+    matches = [r for r in results if config_match.items() <= r.config.items()]
     if len(matches) != 1:
-        raise Exception("Expected exactly one match, got %s for config_match"
-                        " %s" % (len(matches), config_match))
+        raise Exception(
+            "Expected exactly one match, got %s for config_match"
+            " %s" % (len(matches), config_match)
+        )
     return matches[0]
 
 
@@ -383,8 +405,7 @@ class BenchmarkFramework(ABC):
     Subclass it to implement a benchmark. You need to implement the abstract
     methods."""
 
-    def __init__(self, name: str, benchresults_cls=BenchResults,
-                 cli_args=None):
+    def __init__(self, name: str, benchresults_cls=BenchResults, cli_args=None):
         self.name = name
         self.benchresults_cls = benchresults_cls
         if cli_args:
@@ -420,26 +441,50 @@ class BenchmarkFramework(ABC):
         return configs
 
     def parse_args(self):
-        parser = argparse.ArgumentParser("Benchmark %s" % self.name,
-                                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-        parser.add_argument("--cpu", type=str, default="1",
-                            help="Number of CPUs to use. Can be a value, a"
-                                 " range, or a list of comma-separated values"
-                                 " and ranges")
-        parser.add_argument("--results-file", type=str, default="results.json",
-                            help="Path to results file (JSON format)")
+        parser = argparse.ArgumentParser(
+            "Benchmark %s" % self.name,
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        )
+        parser.add_argument(
+            "--cpu",
+            type=str,
+            default="1",
+            help="Number of CPUs to use. Can be a value, a"
+            " range, or a list of comma-separated values"
+            " and ranges",
+        )
+        parser.add_argument(
+            "--results-file",
+            type=str,
+            default="results.json",
+            help="Path to results file (JSON format)",
+        )
         # parser.add_argument("--runtime", type=int, default=60,
         #                     help="Runtime in seconds for each benchmark")
-        parser.add_argument("--no-reuse-results", action="store_true",
-                            default=False,
-                            help="Reuse existing results and only calculate"
-                            " missing results")
-        parser.add_argument("--debug-segfault", action="store_true",
-                            default=False, help="Debug segfaults")
-        parser.add_argument("--default-only", action="store_true",
-                            default=False, help="Run only the default config. Helpful for running MGLRU.")
-        parser.add_argument("--iterations", type=int, default=1,
-                            help="Number of iterations to run for each config")
+        parser.add_argument(
+            "--no-reuse-results",
+            action="store_true",
+            default=False,
+            help="Reuse existing results and only calculate missing results",
+        )
+        parser.add_argument(
+            "--debug-segfault",
+            action="store_true",
+            default=False,
+            help="Debug segfaults",
+        )
+        parser.add_argument(
+            "--default-only",
+            action="store_true",
+            default=False,
+            help="Run only the default config. Helpful for running MGLRU.",
+        )
+        parser.add_argument(
+            "--iterations",
+            type=int,
+            default=1,
+            help="Number of iterations to run for each config",
+        )
         self.add_arguments(parser)
         return parser.parse_args()
 
@@ -450,16 +495,16 @@ class BenchmarkFramework(ABC):
 
         # Parse CPU string
         cpu_amounts = parse_numbers_string(cpu_str)
-        log.info("Will benchmark with each of the following amounts of CPU %s"
-                 % cpu_amounts)
+        log.info(
+            "Will benchmark with each of the following amounts of CPU %s" % cpu_amounts
+        )
 
         i = 1
         results = []
         while os.path.exists(results_file):
             if reuse_results:
                 log.info("Will reuse existing results file %s" % results_file)
-                results = parse_results_file(
-                    results_file, self.benchresults_cls)
+                results = parse_results_file(results_file, self.benchresults_cls)
                 break
             log.info("Not reusing results file %s" % results_file)
             if "." in results_file:
@@ -488,11 +533,13 @@ class BenchmarkFramework(ABC):
                 configs_to_run.append(config)
 
         for idx, config in enumerate(configs_to_run):
-            log.info("Progress: %.1f%% (%s/%s)" %
-                     ((idx+1) / len(configs_to_run)*100, idx+1,
-                      len(configs_to_run)))
-            log.info("Running benchmark for %s with config %s" %
-                     (config["name"], config))
+            log.info(
+                "Progress: %.1f%% (%s/%s)"
+                % ((idx + 1) / len(configs_to_run) * 100, idx + 1, len(configs_to_run))
+            )
+            log.info(
+                "Running benchmark for %s with config %s" % (config["name"], config)
+            )
 
             # Prepare environment for benchmarking
             self.benchmark_prepare(config)
@@ -501,7 +548,7 @@ class BenchmarkFramework(ABC):
             cmd = self.benchmark_cmd(config)
 
             # Limit CPUs
-            cmd = ["taskset", "-c", "0-%s" % str(config["cpus"]-1)] + cmd
+            cmd = ["taskset", "-c", "0-%s" % str(config["cpus"] - 1)] + cmd
 
             env = os.environ
             if self.args.debug_segfault:
@@ -561,8 +608,4 @@ def parse_cpu_string(cpu_string: str):
     return parse_numbers_string(cpu_string)
 
 
-prev_cpu_stats = {
-    "idle": 0.0,
-    "iowait": 0.0,
-    "total": 0.0
-}
+prev_cpu_stats = {"idle": 0.0, "iowait": 0.0, "total": 0.0}

@@ -167,7 +167,9 @@ class LevelDBBenchmark(BenchmarkFramework):
             )
         else:
             configs = add_config_option(
-                "cgroup_name", [DEFAULT_BASELINE_CGROUP, DEFAULT_CACHE_EXT_CGROUP], configs
+                "cgroup_name",
+                [DEFAULT_BASELINE_CGROUP, DEFAULT_CACHE_EXT_CGROUP],
+                configs,
             )
 
         # For baseline cgroup only, add fadvise options
@@ -186,7 +188,9 @@ class LevelDBBenchmark(BenchmarkFramework):
             else:
                 new_configs.append(config)
         configs = new_configs
-        configs = add_config_option("iteration", list(range(1, self.args.iterations + 1)), configs)
+        configs = add_config_option(
+            "iteration", list(range(1, self.args.iterations + 1)), configs
+        )
         return configs
 
     def benchmark_prepare(self, config):

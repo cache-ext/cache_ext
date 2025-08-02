@@ -96,18 +96,24 @@ class FioBenchmark(BenchmarkFramework):
         )
 
     def generate_configs(self, configs: List[Dict]) -> List[Dict]:
-        configs = add_config_option("iteration", list(range(1, self.args.iterations + 1)), configs)
+        configs = add_config_option(
+            "iteration", list(range(1, self.args.iterations + 1)), configs
+        )
         configs = add_config_option("workload", ["randread"], configs)
         configs = add_config_option("runtime_seconds", [60], configs)
         configs = add_config_option("nr_threads", [8], configs)
-        configs = add_config_option("cgroup_size", [5 * GiB, 10 * GiB, 30 * GiB], configs)
+        configs = add_config_option(
+            "cgroup_size", [5 * GiB, 10 * GiB, 30 * GiB], configs
+        )
         if self.args.default_only:
             configs = add_config_option(
                 "cgroup_name", [DEFAULT_BASELINE_CGROUP], configs
             )
         else:
             configs = add_config_option(
-                "cgroup_name", [DEFAULT_BASELINE_CGROUP, DEFAULT_CACHE_EXT_CGROUP], configs
+                "cgroup_name",
+                [DEFAULT_BASELINE_CGROUP, DEFAULT_CACHE_EXT_CGROUP],
+                configs,
             )
 
         for config in configs:
@@ -165,7 +171,10 @@ class FioBenchmark(BenchmarkFramework):
     def after_benchmark(self, config):
         log.info("Stopping CPU usage measurement")
         self.cpu_usage = sum(psutil.cpu_percent(percpu=True)[: config["cpus"]])
-        if config["cgroup_name"] == DEFAULT_CACHE_EXT_CGROUP and self.cache_ext_policy.loader_path:
+        if (
+            config["cgroup_name"] == DEFAULT_CACHE_EXT_CGROUP
+            and self.cache_ext_policy.loader_path
+        ):
             self.cache_ext_policy.stop()
         log.info("Deleting cgroup %s", config["cgroup_name"])
         delete_cgroup(config["cgroup_name"])

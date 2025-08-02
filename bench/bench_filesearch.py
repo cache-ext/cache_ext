@@ -11,7 +11,6 @@ CLEANUP_TASKS = []
 
 
 class FileSearchBenchmark(BenchmarkFramework):
-
     def __init__(self, benchresults_cls=BenchResults, cli_args=None):
         super().__init__("filesearch_benchmark", benchresults_cls, cli_args)
         self.cache_ext_policy = CacheExtPolicy(
@@ -43,9 +42,7 @@ class FileSearchBenchmark(BenchmarkFramework):
 
     def generate_configs(self, configs: List[Dict]) -> List[Dict]:
         configs = add_config_option("passes", [10], configs)
-        configs = add_config_option(
-            "cgroup_size", [1 * GiB], configs
-        )
+        configs = add_config_option("cgroup_size", [1 * GiB], configs)
         if self.args.default_only:
             configs = add_config_option(
                 "cgroup_name", [DEFAULT_BASELINE_CGROUP], configs
@@ -53,11 +50,15 @@ class FileSearchBenchmark(BenchmarkFramework):
 
         else:
             configs = add_config_option(
-                "cgroup_name", [DEFAULT_BASELINE_CGROUP, DEFAULT_CACHE_EXT_CGROUP], configs
+                "cgroup_name",
+                [DEFAULT_BASELINE_CGROUP, DEFAULT_CACHE_EXT_CGROUP],
+                configs,
             )
 
         configs = add_config_option("benchmark", ["filesearch"], configs)
-        configs = add_config_option("iteration", list(range(1, self.args.iterations + 1)), configs)
+        configs = add_config_option(
+            "iteration", list(range(1, self.args.iterations + 1)), configs
+        )
         return configs
 
     def before_benchmark(self, config):
@@ -75,7 +76,9 @@ class FileSearchBenchmark(BenchmarkFramework):
         pattern = "write"
         data_dir = self.args.data_dir
         rg_cmd = f"rg {pattern} {data_dir}"
-        repeated_rg_cmd = f"for i in $(seq 1 {config['passes']}); do {rg_cmd} > /dev/null; done"
+        repeated_rg_cmd = (
+            f"for i in $(seq 1 {config['passes']}); do {rg_cmd} > /dev/null; done"
+        )
         cmd = [
             "sudo",
             "cgexec",
