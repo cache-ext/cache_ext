@@ -16,7 +16,7 @@ YCSB_PATH="$BASE_DIR/My-YCSB"
 DB_PATH=$(realpath "$BASE_DIR/../leveldb")
 RESULTS_PATH="$BASE_DIR/results"
 
-ITERATIONS=1
+ITERATIONS=3
 
 POLICIES=(
 	"cache_ext_lhd"

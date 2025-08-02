@@ -15,7 +15,7 @@ POLICY_PATH="$BASE_DIR/policies"
 FILES_PATH=$(realpath "$BASE_DIR/../linux")
 RESULTS_PATH="$BASE_DIR/results"
 
-ITERATIONS=1
+ITERATIONS=3
 
 mkdir -p "$RESULTS_PATH"
 
