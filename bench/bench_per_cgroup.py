@@ -10,6 +10,8 @@ from bench_lib import *
 
 log = logging.getLogger(__name__)
 GiB = 2**30
+
+# These only run on error
 CLEANUP_TASKS = []
 
 

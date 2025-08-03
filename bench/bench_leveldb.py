@@ -260,6 +260,10 @@ class LevelDBBenchmark(BenchmarkFramework):
 def main():
     global log
     leveldb_bench = LevelDBBenchmark()
+    set_sysctl("vm.dirty_background_ratio", 1)
+    set_sysctl("vm.dirty_ratio", 30)
+    CLEANUP_TASKS.append(lambda: set_sysctl("vm.dirty_background_ratio", 10))
+    CLEANUP_TASKS.append(lambda: set_sysctl("vm.dirty_ratio", 20))
     # Check that leveldb path exists
     if not os.path.exists(leveldb_bench.args.leveldb_db):
         raise Exception(
@@ -274,6 +278,10 @@ def main():
     log.info("LevelDB DB directory: %s", leveldb_bench.args.leveldb_db)
     log.info("LevelDB temp DB directory: %s", leveldb_bench.args.leveldb_temp_db)
     leveldb_bench.benchmark()
+
+    # Reset to default
+    set_sysctl("vm.dirty_background_ratio", 10)
+    set_sysctl("vm.dirty_ratio", 20)
 
 
 if __name__ == "__main__":

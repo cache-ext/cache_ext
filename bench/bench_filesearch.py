@@ -7,6 +7,7 @@ from bench_lib import *
 
 log = logging.getLogger(__name__)
 
+# These only run on error
 CLEANUP_TASKS = []
 
 

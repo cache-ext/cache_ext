@@ -14,17 +14,18 @@ from bench_lib import (
     BenchResults,
     DEFAULT_BASELINE_CGROUP,
     DEFAULT_CACHE_EXT_CGROUP,
-    drop_page_cache,
-    disable_swap,
-    disable_smt,
-    recreate_cache_ext_cgroup,
-    recreate_baseline_cgroup,
-    run,
-    check_output,
     add_config_option,
-    parse_strings_string,
+    check_output,
+    disable_smt,
+    disable_swap,
+    drop_page_cache,
     edit_yaml_file,
+    enable_smt,
     format_bytes_str,
+    parse_strings_string,
+    recreate_baseline_cgroup,
+    recreate_cache_ext_cgroup,
+    run,
     set_sysctl,
 )
 
@@ -32,6 +33,8 @@ yaml = YAML()
 log = logging.getLogger(__name__)
 GiB = 2**30
 MiB = 2**20
+
+# These only run on error
 CLEANUP_TASKS = []
 
 
@@ -328,6 +331,7 @@ class LevelDBTwitterTraceBenchmark(BenchmarkFramework):
         if config["cgroup_name"] == DEFAULT_CACHE_EXT_CGROUP:
             self.cache_ext_policy.stop()
         sleep(2)
+        enable_smt()
 
     def parse_results(self, stdout: str) -> BenchResults:
         results = parse_leveldb_bench_results(stdout)
@@ -355,6 +359,10 @@ def main():
     log.info("LevelDB DB directory: %s", leveldb_bench.args.leveldb_db)
     log.info("LevelDB temp DB directory: %s", leveldb_bench.args.leveldb_temp_db)
     leveldb_bench.benchmark()
+
+    # Reset to default
+    set_sysctl("vm.dirty_background_ratio", 10)
+    set_sysctl("vm.dirty_ratio", 20)
 
 
 if __name__ == "__main__":

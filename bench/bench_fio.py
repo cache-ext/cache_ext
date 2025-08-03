@@ -10,6 +10,7 @@ from bench_lib import *
 
 log = logging.getLogger(__name__)
 
+# These only run on error
 CLEANUP_TASKS = []
 
 
@@ -142,7 +143,7 @@ class FioBenchmark(BenchmarkFramework):
             recreate_baseline_cgroup(limit_in_bytes=config["cgroup_size"])
 
     def before_benchmark(self, config):
-        log.info("Startin to measure CPU usage")
+        log.info("Starting to measure CPU usage")
         # Get the cpu usage of the the first n cpus used by the benchmark
         psutil.cpu_percent(percpu=True)
 
@@ -178,6 +179,7 @@ class FioBenchmark(BenchmarkFramework):
             self.cache_ext_policy.stop()
         log.info("Deleting cgroup %s", config["cgroup_name"])
         delete_cgroup(config["cgroup_name"])
+        enable_smt()
 
     def parse_results(self, stdout: str) -> BenchResults:
         # parse fio output
