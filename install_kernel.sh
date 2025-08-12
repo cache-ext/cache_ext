@@ -25,7 +25,9 @@ make distclean
 
 echo "Configuring kernel..."
 make olddefconfig
-yes '' | make localmodconfig
+
+# Ignore 'yes' exist status
+{ yes '' || true;} | make localmodconfig
 
 scripts/config --set-str LOCALVERSION "-cache-ext"
 scripts/config --set-str SYSTEM_TRUSTED_KEYS ''
