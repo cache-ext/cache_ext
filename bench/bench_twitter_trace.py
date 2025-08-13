@@ -270,7 +270,7 @@ class LevelDBTwitterTraceBenchmark(BenchmarkFramework):
 
         if config["cgroup_name"] == DEFAULT_CACHE_EXT_CGROUP:
             recreate_cache_ext_cgroup(limit_in_bytes=cgroup_size)
-            if self.cache_ext_policy.loader_path == "./cache_ext_s3fifo.out":
+            if config["policy_loader"] == "cache_ext_s3fifo.out":
                 self.cache_ext_policy.start(cgroup_size=cgroup_size)
             else:
                 self.cache_ext_policy.start()
