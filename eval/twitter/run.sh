@@ -45,7 +45,7 @@ if ! "$BASE_DIR/utils/disable-mglru.sh"; then
 fi
 
 # Baseline and cache_ext
-# TODO: Get rid of the CLUSTER loop and pass a comma-separate list of benchmarks
+# TODO: Get rid of the CLUSTER loop and pass a comma-separated list of benchmarks
 #	We already support this in the bench script.
 for POLICY in "${POLICIES[@]}"; do
 	for CLUSTER in "${CLUSTERS[@]}"; do
@@ -69,7 +69,7 @@ if ! "$BASE_DIR/utils/enable-mglru.sh"; then
 fi
 
 # MGLRU
-# TODO: Get rid of the CLUSTER loop and pass a comma-separate list of benchmarks
+# TODO: Get rid of the CLUSTER loop and pass a comma-separated list of benchmarks
 #	We already support this in the bench script.
 for POLICY in "${POLICIES[@]}"; do
 	for CLUSTER in "${CLUSTERS[@]}"; do
