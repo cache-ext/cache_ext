@@ -131,3 +131,5 @@ jupyter notebook
 This will start a Jupyter server and open a web interface in your browser.
 You can then open the `bench_plot.ipynb` notebook and run the cells to generate
 the plots.
+
+The figures will be saved as PDFs in a created `figures/` directory.
