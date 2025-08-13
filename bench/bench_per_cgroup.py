@@ -208,6 +208,8 @@ class PerCgroupBenchmark(BenchmarkFramework):
 
         # Only initialize cache_ext policies if not using default mode
         if not self.args.default:
+            # TODO: set the watch dirs more precisely to avoid needing recursive
+            # watch dir initialization.
             self.cache_ext_policy = CacheExtPolicy(
                 DEFAULT_CACHE_EXT_CGROUP, self.args.policy_loader, self.args.search_path
             )
