@@ -114,34 +114,24 @@ int main(int argc, char **argv)
 	ret = initialize_watch_dir_map(args.watch_dir,
 				       bpf_map__fd(skel->maps.inode_watchlist), false);
 
-	// Pin scan_pids map
-	ret = bpf_map__pin(skel->maps.scan_pids, "/sys/fs/bpf/cache_ext/scan_pids");
-	if (ret < 0) {
-		perror("Failed to pin scan_pids map");
-		goto cleanup;
-	}
-
-	// Attach cache_ext_ops to the specific cgroup
-	link = bpf_map__attach_cache_ext_ops(skel->maps.sampling_ops, cgroup_fd);
-	if (link == NULL) {
+        // Attach cache_ext_ops to the specific cgroup
+        link =
+            bpf_map__attach_cache_ext_ops(skel->maps.sampling_ops, cgroup_fd);
+        if (link == NULL) {
 		perror("Failed to attach BPF cache_ext_ops to cgroup");
-		goto cleanup_unpin;
-	}
+                goto cleanup;
+        }
 
-	// Attach probes
-	ret = cache_ext_sampling_bpf__attach(skel);
+        // Attach probes
+        ret = cache_ext_sampling_bpf__attach(skel);
 	if (ret) {
 		perror("Failed to attach BPF programs");
-		goto cleanup_unpin;
-	}
+                goto cleanup;
+        }
 
-	// Wait for keyboard input
+        // Wait for keyboard input
 	printf("Press any key to exit...\n");
 	getchar();
-
-cleanup_unpin:
-	if (bpf_map__unpin(skel->maps.scan_pids, "/sys/fs/bpf/cache_ext/scan_pids") < 0)
-		perror("Failed to unpin scan_pids map");
 
 cleanup:
 	close(cgroup_fd);

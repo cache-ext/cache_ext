@@ -31,13 +31,6 @@ char _license[] SEC("license") = "GPL";
  * Maps
  */
 
-struct {
-    __uint(type, BPF_MAP_TYPE_HASH);
-    __type(key, int);
-    __type(value, bool);
-    __uint(max_entries, 100);
-} scan_pids SEC(".maps");
-
 #define MAX_PAGES (1 << 20)
 
 struct folio_metadata {
