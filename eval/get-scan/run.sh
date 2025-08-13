@@ -42,8 +42,9 @@ python3 "$BENCH_PATH/bench_leveldb.py" \
 	--results-file "$RESULTS_PATH/get_scan_results.json" \
 	--leveldb-db "$DB_PATH" \
 	--fadvise-hints ",SEQUENTIAL,NOREUSE,DONTNEED" \
-        --iterations "$ITERATIONS" \
-        --bench-binary-dir "$YCSB_PATH/build" \
+	--iterations "$ITERATIONS" \
+	--bench-binary-dir "$YCSB_PATH/build" \
+	--no-sysctl \
 	--benchmark mixed_get_scan
 
 # Enable MGLRU
@@ -59,9 +60,10 @@ python3 "$BENCH_PATH/bench_leveldb.py" \
 	--results-file "$RESULTS_PATH/get_scan_results_mglru.json" \
 	--leveldb-db "$DB_PATH" \
 	--fadvise-hints "" \
-        --iterations "$ITERATIONS" \
-        --bench-binary-dir "$YCSB_PATH/build" \
+	--iterations "$ITERATIONS" \
+	--bench-binary-dir "$YCSB_PATH/build" \
 	--benchmark mixed_get_scan \
+	--no-sysctl \
 	--default-only
 
 # Disable MGLRU

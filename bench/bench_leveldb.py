@@ -114,6 +114,13 @@ class LevelDBBenchmark(BenchmarkFramework):
             DEFAULT_CACHE_EXT_CGROUP, self.args.policy_loader, self.args.leveldb_temp_db
         )
         CLEANUP_TASKS.append(lambda: self.cache_ext_policy.stop())
+        
+        # Set sysctl values if not disabled
+        if not self.args.no_sysctl:
+            set_sysctl("vm.dirty_background_ratio", 1)
+            set_sysctl("vm.dirty_ratio", 30)
+            CLEANUP_TASKS.append(lambda: set_sysctl("vm.dirty_background_ratio", 10))
+            CLEANUP_TASKS.append(lambda: set_sysctl("vm.dirty_ratio", 20))
 
     def add_arguments(self, parser: argparse.ArgumentParser):
         parser.add_argument(
@@ -151,6 +158,12 @@ class LevelDBBenchmark(BenchmarkFramework):
             type=str,
             default="",
             help="Specify the fadvise hints to use for the baseline cgroup, e.g., ',SEQUENTIAL,NOREUSE,DONTNEED'",
+        )
+        parser.add_argument(
+            "--no-sysctl",
+            action="store_true",
+            default=False,
+            help="Disable sysctl settings for vm.dirty_background_ratio and vm.dirty_ratio",
         )
 
     def generate_configs(self, configs: List[Dict]) -> List[Dict]:
@@ -260,10 +273,6 @@ class LevelDBBenchmark(BenchmarkFramework):
 def main():
     global log
     leveldb_bench = LevelDBBenchmark()
-    set_sysctl("vm.dirty_background_ratio", 1)
-    set_sysctl("vm.dirty_ratio", 30)
-    CLEANUP_TASKS.append(lambda: set_sysctl("vm.dirty_background_ratio", 10))
-    CLEANUP_TASKS.append(lambda: set_sysctl("vm.dirty_ratio", 20))
     # Check that leveldb path exists
     if not os.path.exists(leveldb_bench.args.leveldb_db):
         raise Exception(
