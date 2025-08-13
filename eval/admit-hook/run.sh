@@ -1,5 +1,5 @@
 #!/bin/bash
-# Admit-hook RocksDB benchmark run script
+# Application-informed admission filter run script (Section 6.1.4)
 set -eu -o pipefail
 
 if ! uname -r | grep -q "cache-ext"; then
@@ -7,6 +7,9 @@ if ! uname -r | grep -q "cache-ext"; then
 	echo "Please switch to the cache_ext kernel and try again."
 	exit 1
 fi
+
+# Disable MGLRU in case it's enabled from other experiments
+echo n | sudo tee /sys/kernel/mm/lru_gen/enabled > /dev/null
 
 SCRIPT_PATH=$(realpath $0)
 BASE_DIR=$(realpath "$(dirname $SCRIPT_PATH)/../../")
@@ -34,24 +37,24 @@ cd -
 # Run baseline (without admit-hook)
 echo "Running baseline"
 python3 "$BENCH_PATH/bench_admit_hook.py" \
-    --cpu 3 \
-    --bench-binary-dir "$YCSB_PATH/build" \
-    --benchmark "uniform_read_write,ycsb_a" \
-    --rocksdb-db "$ROCKSDB_DB" \
-    --rocksdb-backup "$ROCKSDB_BACKUP" \
-    --iterations "$ITERATIONS" \
-    --results-file "$RESULTS_PATH/admit_hook_results.json"
+	--cpu 3 \
+	--bench-binary-dir "$YCSB_PATH/build" \
+	--benchmark "uniform_read_write,ycsb_a" \
+	--rocksdb-db "$ROCKSDB_DB" \
+	--rocksdb-backup "$ROCKSDB_BACKUP" \
+	--iterations "$ITERATIONS" \
+	--results-file "$RESULTS_PATH/admit_hook_results.json"
 
 # Run with admit-hook enabled
 echo "Running admit-hook"
 python3 "$BENCH_PATH/bench_admit_hook.py" \
-    --cpu 3 \
-    --bench-binary-dir "$YCSB_PATH/build" \
-    --benchmark "uniform_read_write,ycsb_a" \
-    --rocksdb-db "$ROCKSDB_DB" \
-    --rocksdb-backup "$ROCKSDB_BACKUP" \
-    --iterations "$ITERATIONS" \
-    --results-file "$RESULTS_PATH/admit_hook_results.json" \
-    --use-admit-hook
+	--cpu 3 \
+	--bench-binary-dir "$YCSB_PATH/build" \
+	--benchmark "uniform_read_write,ycsb_a" \
+	--rocksdb-db "$ROCKSDB_DB" \
+	--rocksdb-backup "$ROCKSDB_BACKUP" \
+	--iterations "$ITERATIONS" \
+	--results-file "$RESULTS_PATH/admit_hook_results.json" \
+	--use-admit-hook
 
 echo "Admit-hook benchmark completed. Results saved to $RESULTS_PATH."

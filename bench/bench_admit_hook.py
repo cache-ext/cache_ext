@@ -213,12 +213,6 @@ def main():
     global log
     admit_hook_bench = AdmitHookBenchmark()
     
-    # Set dirty page settings for better performance
-    set_sysctl("vm.dirty_background_ratio", 1)
-    set_sysctl("vm.dirty_ratio", 30)
-    CLEANUP_TASKS.append(lambda: set_sysctl("vm.dirty_background_ratio", 10))
-    CLEANUP_TASKS.append(lambda: set_sysctl("vm.dirty_ratio", 20))
-    
     # Check that rocksdb paths exist
     if not os.path.exists(admit_hook_bench.args.rocksdb_db):
         raise Exception(
@@ -245,10 +239,6 @@ def main():
     log.info("Admit-hook enabled: %s", admit_hook_bench.args.use_admit_hook)
     
     admit_hook_bench.benchmark()
-    
-    # Reset to default
-    set_sysctl("vm.dirty_background_ratio", 10)
-    set_sysctl("vm.dirty_ratio", 20)
 
 
 if __name__ == "__main__":

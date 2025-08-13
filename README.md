@@ -25,6 +25,7 @@ cache_ext
 |-- policies/                   : eBPF page cache eviction policies
 |-- bench/                      : Benchmarking framework
 |-- eval/                       : Evaluation scripts and result analysis
+|   |-- admit-hook/             : Application-informed admission filter experiment
 |   |-- cpu-overhead/           : CPU overhead experiment
 |   |-- filesearch/             : File search experiment
 |   |-- get-scan/               : GET-SCAN experiment
