@@ -22,8 +22,13 @@ DEFAULT_BASELINE_CGROUP = "baseline_test"
 
 
 class CacheExtPolicy:
+
+    def set_cgroup(self, cgroup: str):
+        """Set the cgroup path for the policy."""
+        self.cgroup_path = f"/sys/fs/cgroup/{cgroup}"
+
     def __init__(self, cgroup: str, loader_path: str, watch_dir: str):
-        self.cgroup_path = "/sys/fs/cgroup/%s" % cgroup
+        self.set_cgroup(cgroup)
         self.loader_path = loader_path
         self.watch_dir = watch_dir
         self.has_started = False
