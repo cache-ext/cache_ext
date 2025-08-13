@@ -5,6 +5,7 @@ import re
 from time import sleep
 from typing import Dict, List
 
+import psutil
 from bench_lib import *
 
 
@@ -114,6 +115,9 @@ class LevelDBBenchmark(BenchmarkFramework):
             DEFAULT_CACHE_EXT_CGROUP, self.args.policy_loader, self.args.leveldb_temp_db
         )
         CLEANUP_TASKS.append(lambda: self.cache_ext_policy.stop())
+        # Initialize disk I/O counters storage
+        self.disk_io_start = {}
+        self.disk_io_end = {}
 
     def add_arguments(self, parser: argparse.ArgumentParser):
         parser.add_argument(
@@ -209,6 +213,27 @@ class LevelDBBenchmark(BenchmarkFramework):
         else:
             recreate_baseline_cgroup(limit_in_bytes=config["cgroup_size"])
 
+    def before_benchmark(self, config):
+        """Capture initial disk I/O counters before benchmark starts."""
+        log.info("Capturing initial disk I/O counters")
+        self.disk_io_start = {}
+        try:
+            for device, counters in psutil.disk_io_counters(perdisk=True).items():
+                self.disk_io_start[device] = {
+                    'read_count': counters.read_count,
+                    'write_count': counters.write_count,
+                    'read_bytes': counters.read_bytes,
+                    'write_bytes': counters.write_bytes,
+                    'read_time': counters.read_time,
+                    'write_time': counters.write_time,
+                    'busy_time': getattr(counters, 'busy_time', 0),
+                    'read_merged_count': getattr(counters, 'read_merged_count', 0),
+                    'write_merged_count': getattr(counters, 'write_merged_count', 0),
+                }
+        except Exception as e:
+            log.warning("Failed to capture initial disk I/O counters: %s", e)
+            self.disk_io_start = {}
+
     def benchmark_cmd(self, config):
         bench_binary_dir = self.args.bench_binary_dir
         leveldb_temp_db_dir = self.args.leveldb_temp_db
@@ -247,13 +272,70 @@ class LevelDBBenchmark(BenchmarkFramework):
         return extra_envs
 
     def after_benchmark(self, config):
+        """Capture final disk I/O counters and stop cache_ext policy if needed."""
+        log.info("Capturing final disk I/O counters")
+        self.disk_io_end = {}
+        try:
+            for device, counters in psutil.disk_io_counters(perdisk=True).items():
+                self.disk_io_end[device] = {
+                    'read_count': counters.read_count,
+                    'write_count': counters.write_count,
+                    'read_bytes': counters.read_bytes,
+                    'write_bytes': counters.write_bytes,
+                    'read_time': counters.read_time,
+                    'write_time': counters.write_time,
+                    'busy_time': getattr(counters, 'busy_time', 0),
+                    'read_merged_count': getattr(counters, 'read_merged_count', 0),
+                    'write_merged_count': getattr(counters, 'write_merged_count', 0),
+                }
+        except Exception as e:
+            log.warning("Failed to capture final disk I/O counters: %s", e)
+            self.disk_io_end = {}
+        
         if config["cgroup_name"] == DEFAULT_CACHE_EXT_CGROUP:
             self.cache_ext_policy.stop()
         sleep(2)
         enable_smt()
 
+    def _calculate_disk_io_usage(self):
+        """Calculate disk I/O usage during the benchmark period."""
+        disk_io_usage = {}
+        
+        if not self.disk_io_start or not self.disk_io_end:
+            log.warning("Disk I/O counters not properly captured")
+            return disk_io_usage
+        
+        # Calculate differences for each disk device
+        for device in self.disk_io_start:
+            if device in self.disk_io_end:
+                start = self.disk_io_start[device]
+                end = self.disk_io_end[device]
+                
+                disk_io_usage[device] = {
+                    'read_count': end['read_count'] - start['read_count'],
+                    'write_count': end['write_count'] - start['write_count'],
+                    'read_bytes': end['read_bytes'] - start['read_bytes'],
+                    'write_bytes': end['write_bytes'] - start['write_bytes'],
+                    'read_time': end['read_time'] - start['read_time'],
+                    'write_time': end['write_time'] - start['write_time'],
+                    'busy_time': end['busy_time'] - start['busy_time'],
+                    'read_merged_count': end['read_merged_count'] - start['read_merged_count'],
+                    'write_merged_count': end['write_merged_count'] - start['write_merged_count'],
+                }
+        
+        return disk_io_usage
+
     def parse_results(self, stdout: str) -> BenchResults:
         results = parse_leveldb_bench_results(stdout)
+        
+        # Add disk I/O usage data
+        disk_io_usage = self._calculate_disk_io_usage()
+        if disk_io_usage:
+            results["disk_io_usage"] = disk_io_usage
+            log.info("Added disk I/O usage data for %d devices", len(disk_io_usage))
+        else:
+            log.warning("No disk I/O usage data available")
+        
         return BenchResults(results)
 
 
