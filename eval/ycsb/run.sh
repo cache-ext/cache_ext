@@ -45,16 +45,16 @@ fi
 
 # Baseline and cache_ext
 for POLICY in "${POLICIES[@]}"; do
-    echo "Running policy: ${POLICY}"
-    python3 "$BENCH_PATH/bench_leveldb.py" \
-        --cpu 8 \
-        --policy-loader "$POLICY_PATH/${POLICY}.out" \
-        --results-file "$RESULTS_PATH/ycsb_results.json" \
-        --leveldb-db "$DB_PATH" \
-        --fadvise-hints "" \
-        --iterations "$ITERATIONS" \
-        --bench-binary-dir "$YCSB_PATH/build" \
-        --benchmark ycsb_a,ycsb_b,ycsb_c,ycsb_d,ycsb_e,ycsb_f,uniform,uniform_read_write
+	echo "Running policy: ${POLICY}"
+	python3 "$BENCH_PATH/bench_leveldb.py" \
+		--cpu 8 \
+		--policy-loader "$POLICY_PATH/${POLICY}.out" \
+		--results-file "$RESULTS_PATH/ycsb_results.json" \
+		--leveldb-db "$DB_PATH" \
+		--fadvise-hints "" \
+		--iterations "$ITERATIONS" \
+		--bench-binary-dir "$YCSB_PATH/build" \
+		--benchmark ycsb_a,ycsb_b,ycsb_c,ycsb_d,ycsb_e,ycsb_f,uniform,uniform_read_write
 done
 
 # Enable MGLRU
@@ -65,17 +65,17 @@ fi
 
 # MGLRU
 for POLICY in "${POLICIES[@]}"; do
-    echo "Running policy: ${POLICY}"
-    python3 "$BENCH_PATH/bench_leveldb.py" \
-        --cpu 8 \
-        --policy-loader "$POLICY_PATH/${POLICY}.out" \
-        --results-file "$RESULTS_PATH/ycsb_results_mglru.json" \
-        --leveldb-db "$DB_PATH" \
-        --fadvise-hints "" \
-        --iterations "$ITERATIONS" \
-        --bench-binary-dir "$YCSB_PATH/build" \
-        --benchmark ycsb_a,ycsb_b,ycsb_c,ycsb_d,ycsb_e,ycsb_f,uniform,uniform_read_write \
-        --default-only
+	echo "Running policy: ${POLICY}"
+	python3 "$BENCH_PATH/bench_leveldb.py" \
+		--cpu 8 \
+		--policy-loader "$POLICY_PATH/${POLICY}.out" \
+		--results-file "$RESULTS_PATH/ycsb_results_mglru.json" \
+		--leveldb-db "$DB_PATH" \
+		--fadvise-hints "" \
+		--iterations "$ITERATIONS" \
+		--bench-binary-dir "$YCSB_PATH/build" \
+		--benchmark ycsb_a,ycsb_b,ycsb_c,ycsb_d,ycsb_e,ycsb_f,uniform,uniform_read_write \
+		--default-only
 done
 
 # Disable MGLRU
