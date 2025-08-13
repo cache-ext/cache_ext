@@ -13,6 +13,9 @@ sudo apt-get update
 #   python3-matplotlib: Required for Python plotting scripts
 #   python3-pandas: Required for Python plotting scripts
 #   python3-psutil: Required for Python fio benchmarking script
+#   jupyter-core: Required for running Jupyter notebook for figures
+#   jupyter-notebook: Required for running Jupyter notebook for figures
 #   screen: Required for running long-running scripts in the background
 sudo apt-get install -y fio cgroup-tools python3-ruamel.yaml python3-numpy \
-			python3-matplotlib python3-pandas python3-psutil screen
+			python3-matplotlib python3-pandas python3-psutil \
+			jupyter-core jupyter-notebook screen
