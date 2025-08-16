@@ -193,7 +193,15 @@ def main():
     disable_smt()
 
     fio_bench = FioBenchmark()
+    set_sysctl("vm.dirty_background_ratio", 1)
+    set_sysctl("vm.dirty_ratio", 30)
+    CLEANUP_TASKS.append(lambda: set_sysctl("vm.dirty_background_ratio", 10))
+    CLEANUP_TASKS.append(lambda: set_sysctl("vm.dirty_ratio", 20))
     fio_bench.benchmark()
+
+    # Reset to default
+    set_sysctl("vm.dirty_background_ratio", 10)
+    set_sysctl("vm.dirty_ratio", 20)
 
 
 if __name__ == "__main__":
