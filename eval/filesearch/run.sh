@@ -40,6 +40,7 @@ if ! "$BASE_DIR/utils/enable-mglru.sh"; then
 fi
 
 # MGLRU
+# TODO: Remove --policy-loader requirement when using --default-only
 python3 "$BENCH_PATH/bench_filesearch.py" \
 	--cpu 8 \
 	--policy-loader "$POLICY_PATH/cache_ext_mru.out" \

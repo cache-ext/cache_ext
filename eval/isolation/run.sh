@@ -36,6 +36,8 @@ if ! "$BASE_DIR/utils/disable-mglru.sh"; then
 	exit 1
 fi
 
+# TODO: Convert the following to a loop
+
 python3 "$BENCH_PATH/bench_per_cgroup.py" \
 	--cpu 8 \
 	--search-path "$SEARCH_PATH" \

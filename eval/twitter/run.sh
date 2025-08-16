@@ -58,7 +58,7 @@ for POLICY in "${POLICIES[@]}"; do
 			--iterations "$ITERATIONS" \
 			--bench-binary-dir "$YCSB_PATH/build" \
 			--twitter-traces-dir "$DB_DIRS/twitter-traces" \
-			--benchmark twitter_cluster${CLUSTER}_bench
+			--benchmark "twitter_cluster${CLUSTER}_bench"
 	done
 done
 
@@ -71,20 +71,19 @@ fi
 # MGLRU
 # TODO: Get rid of the CLUSTER loop and pass a comma-separated list of benchmarks
 #	We already support this in the bench script.
-for POLICY in "${POLICIES[@]}"; do
-	for CLUSTER in "${CLUSTERS[@]}"; do
-		echo "Running policy: ${POLICY} on cluster ${CLUSTER}"
-		python3 "$BENCH_PATH/bench_twitter_trace.py" \
-			--cpu 8 \
-			--policy-loader ./${POLICY}.out \
-			--results-file "$RESULTS_PATH/twitter_traces_${CLUSTER}_results_mglru.json" \
-			--leveldb-db "$DB_DIRS/leveldb_twitter_cluster${CLUSTER}_db" \
-			--iterations "$ITERATIONS" \
-			--bench-binary-dir "$YCSB_PATH/build" \
-			--twitter-traces-dir "$DB_DIRS/twitter-traces" \
-			--benchmark twitter_cluster${CLUSTER}_bench \
-			--default-only
-	done
+# TODO: Remove --policy-loader requirement when using --default-only
+for CLUSTER in "${CLUSTERS[@]}"; do
+	echo "Running baseline MGLRU on cluster ${CLUSTER}"
+	python3 "$BENCH_PATH/bench_twitter_trace.py" \
+		--cpu 8 \
+		--policy-loader "$POLICY_PATH/${POLICIES[0]}.out" \
+		--results-file "$RESULTS_PATH/twitter_traces_${CLUSTER}_results_mglru.json" \
+		--leveldb-db "$DB_DIRS/leveldb_twitter_cluster${CLUSTER}_db" \
+		--iterations "$ITERATIONS" \
+		--bench-binary-dir "$YCSB_PATH/build" \
+		--twitter-traces-dir "$DB_DIRS/twitter-traces" \
+		--benchmark "twitter_cluster${CLUSTER}_bench" \
+		--default-only
 done
 
 # Disable MGLRU

@@ -64,19 +64,18 @@ if ! "$BASE_DIR/utils/enable-mglru.sh"; then
 fi
 
 # MGLRU
-for POLICY in "${POLICIES[@]}"; do
-	echo "Running policy: ${POLICY}"
-	python3 "$BENCH_PATH/bench_leveldb.py" \
-		--cpu 8 \
-		--policy-loader "$POLICY_PATH/${POLICY}.out" \
-		--results-file "$RESULTS_PATH/ycsb_results_mglru.json" \
-		--leveldb-db "$DB_PATH" \
-		--fadvise-hints "" \
-		--iterations "$ITERATIONS" \
-		--bench-binary-dir "$YCSB_PATH/build" \
-		--benchmark ycsb_a,ycsb_b,ycsb_c,ycsb_d,ycsb_e,ycsb_f,uniform,uniform_read_write \
-		--default-only
-done
+# TODO: Remove --policy-loader requirement when using --default-only
+echo "Running baseline MGLRU"
+python3 "$BENCH_PATH/bench_leveldb.py" \
+	--cpu 8 \
+	--policy-loader "$POLICY_PATH/${POLICY}.out" \
+	--results-file "$RESULTS_PATH/ycsb_results_mglru.json" \
+	--leveldb-db "$DB_PATH" \
+	--fadvise-hints "" \
+	--iterations "$ITERATIONS" \
+	--bench-binary-dir "$YCSB_PATH/build" \
+	--benchmark ycsb_a,ycsb_b,ycsb_c,ycsb_d,ycsb_e,ycsb_f,uniform,uniform_read_write \
+	--default-only
 
 # Disable MGLRU
 if ! "$BASE_DIR/utils/disable-mglru.sh"; then
