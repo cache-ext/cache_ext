@@ -14,10 +14,15 @@ CLEANUP_TASKS = []
 class FileSearchBenchmark(BenchmarkFramework):
     def __init__(self, benchresults_cls=BenchResults, cli_args=None):
         super().__init__("filesearch_benchmark", benchresults_cls, cli_args)
-        self.cache_ext_policy = CacheExtPolicy(
-            DEFAULT_CACHE_EXT_CGROUP, self.args.policy_loader, self.args.data_dir
-        )
-        CLEANUP_TASKS.append(lambda: self.cache_ext_policy.stop())
+        
+        # Only create cache_ext_policy if policy_loader is provided
+        if hasattr(self.args, 'policy_loader') and self.args.policy_loader:
+            self.cache_ext_policy = CacheExtPolicy(
+                DEFAULT_CACHE_EXT_CGROUP, self.args.policy_loader, self.args.data_dir
+            )
+            CLEANUP_TASKS.append(lambda: self.cache_ext_policy.stop())
+        else:
+            self.cache_ext_policy = None
 
     def add_arguments(self, parser: argparse.ArgumentParser):
         parser.add_argument(
@@ -29,17 +34,15 @@ class FileSearchBenchmark(BenchmarkFramework):
         parser.add_argument(
             "--policy-loader",
             type=str,
-            required=True,
+            required=False,
             help="Specify the path to the policy loader binary",
         )
 
-    def benchmark_cmd(self):
-        # Start the cache extension policy
-        self.cache_ext_policy.start()
-        # Run the benchmark
-        self.run_benchmark()
-        # Stop the cache extension policy
-        self.cache_ext_policy.stop()
+    def validate_args(self):
+        """Validate the parsed arguments."""
+        # Check if policy-loader is required
+        if not self.args.default_only and not self.args.policy_loader:
+            raise ValueError("--policy-loader is required when --default-only is not set")
 
     def generate_configs(self, configs: List[Dict]) -> List[Dict]:
         configs = add_config_option("passes", [10], configs)

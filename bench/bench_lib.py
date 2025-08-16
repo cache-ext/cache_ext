@@ -418,6 +418,9 @@ class BenchmarkFramework(ABC):
             self.args = cli_args
         else:
             self.args = self.parse_args()
+        
+        # Validate arguments after parsing
+        self.validate_args()
 
         self.second_command = False
 
@@ -447,6 +450,10 @@ class BenchmarkFramework(ABC):
     @abstractmethod
     def add_arguments(self, parser: argparse.ArgumentParser):
         raise NotImplementedError
+
+    def validate_args(self):
+        """Validate the parsed arguments. Raise an exception if arguments are invalid."""
+        pass
 
     def generate_configs(self, configs: List[Dict]) -> List[Dict]:
         return configs

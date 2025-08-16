@@ -155,10 +155,15 @@ class LevelDBTwitterTraceBenchmark(BenchmarkFramework):
         super().__init__("leveldb_twitter_trace_benchmark", benchresults_cls, cli_args)
         if self.args.leveldb_temp_db is None:
             self.args.leveldb_temp_db = self.args.leveldb_db + "_temp"
-        self.cache_ext_policy = CacheExtPolicy(
-            DEFAULT_CACHE_EXT_CGROUP, self.args.policy_loader, self.args.leveldb_temp_db
-        )
-        CLEANUP_TASKS.append(lambda: self.cache_ext_policy.stop())
+        
+        # Only create cache_ext_policy if policy_loader is provided
+        if hasattr(self.args, 'policy_loader') and self.args.policy_loader:
+            self.cache_ext_policy = CacheExtPolicy(
+                DEFAULT_CACHE_EXT_CGROUP, self.args.policy_loader, self.args.leveldb_temp_db
+            )
+            CLEANUP_TASKS.append(lambda: self.cache_ext_policy.stop())
+        else:
+            self.cache_ext_policy = None
 
     def add_arguments(self, parser: argparse.ArgumentParser):
         parser.add_argument(
@@ -176,7 +181,7 @@ class LevelDBTwitterTraceBenchmark(BenchmarkFramework):
         parser.add_argument(
             "--policy-loader",
             type=str,
-            required=True,
+            required=False,
             help="Specify the path to the policy loader binary",
         )
         parser.add_argument(
@@ -198,6 +203,12 @@ class LevelDBTwitterTraceBenchmark(BenchmarkFramework):
             help="Specify the directory containing Twitter trace metadata files",
         )
 
+    def validate_args(self):
+        """Validate the parsed arguments."""
+        # Check if policy-loader is required
+        if not self.args.default_only and not self.args.policy_loader:
+            raise ValueError("--policy-loader is required when --default-only is not set")
+
     def generate_configs(self, configs: List[Dict]) -> List[Dict]:
         configs = add_config_option("enable_mmap", [False], configs)
         configs = add_config_option("runtime_seconds", [240], configs)
@@ -217,10 +228,11 @@ class LevelDBTwitterTraceBenchmark(BenchmarkFramework):
                 configs,
             )
 
-        policy_loader_name = os.path.basename(self.cache_ext_policy.loader_path)
-        for config in configs:
-            if config["cgroup_name"] == DEFAULT_CACHE_EXT_CGROUP:
-                config["policy_loader"] = policy_loader_name
+        if self.cache_ext_policy:
+            policy_loader_name = os.path.basename(self.cache_ext_policy.loader_path)
+            for config in configs:
+                if config["cgroup_name"] == DEFAULT_CACHE_EXT_CGROUP:
+                    config["policy_loader"] = policy_loader_name
 
         configs = add_config_option(
             "iteration", list(range(1, self.args.iterations + 1)), configs
