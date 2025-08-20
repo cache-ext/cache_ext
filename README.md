@@ -1,5 +1,7 @@
 # cache_ext: Custom Page Cache Eviction Policies with eBPF
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16915471.svg)](https://doi.org/10.5281/zenodo.16915471)
+
 This repository contains source code and scripts for reproducing key results
 from the cache_ext paper (to appear in SOSP 2025) for the purposes of artifact
 evaluation.
