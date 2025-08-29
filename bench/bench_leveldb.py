@@ -159,8 +159,8 @@ class LevelDBBenchmark(BenchmarkFramework):
 
     def generate_configs(self, configs: List[Dict]) -> List[Dict]:
         configs = add_config_option("enable_mmap", [False], configs)
-        configs = add_config_option("runtime_seconds", [240], configs)
-        configs = add_config_option("warmup_runtime_seconds", [45], configs)
+        configs = add_config_option("runtime_seconds", [1000], configs)
+        configs = add_config_option("warmup_runtime_seconds", [1000], configs)
         configs = add_config_option(
             "benchmark", parse_strings_string(self.args.benchmark), configs
         )
@@ -248,6 +248,8 @@ class LevelDBBenchmark(BenchmarkFramework):
             bench_config["workload"]["warmup_runtime_seconds"] = config[
                 "warmup_runtime_seconds"
             ]
+            bench_config["workload"]["nr_warmup_op"] = 40000
+            bench_config["workload"]["nr_op"] = 1000000
         cmd = [
             "sudo",
             "cgexec",

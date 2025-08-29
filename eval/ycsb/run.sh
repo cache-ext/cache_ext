@@ -16,7 +16,7 @@ YCSB_PATH="$BASE_DIR/My-YCSB"
 DB_PATH=$(realpath "$BASE_DIR/../leveldb")
 RESULTS_PATH="$BASE_DIR/results"
 
-ITERATIONS=3
+ITERATIONS=1
 
 POLICIES=(
 	"cache_ext_lhd"
@@ -54,7 +54,8 @@ for POLICY in "${POLICIES[@]}"; do
 		--fadvise-hints "" \
 		--iterations "$ITERATIONS" \
 		--bench-binary-dir "$YCSB_PATH/build" \
-		--benchmark ycsb_a,ycsb_b,ycsb_c,ycsb_d,ycsb_e,ycsb_f,uniform,uniform_read_write
+		--benchmark ycsb_a,ycsb_b,ycsb_c,ycsb_f,uniform_read_write
+#		--benchmark ycsb_a,ycsb_b,ycsb_c,ycsb_d,ycsb_e,ycsb_f,uniform,uniform_read_write
 done
 
 # Enable MGLRU
@@ -74,7 +75,7 @@ for POLICY in "${POLICIES[@]}"; do
 		--fadvise-hints "" \
 		--iterations "$ITERATIONS" \
 		--bench-binary-dir "$YCSB_PATH/build" \
-		--benchmark ycsb_a,ycsb_b,ycsb_c,ycsb_d,ycsb_e,ycsb_f,uniform,uniform_read_write \
+		--benchmark ycsb_a,ycsb_b,ycsb_c,ycsb_f,uniform_read_write \
 		--default-only
 done
 
