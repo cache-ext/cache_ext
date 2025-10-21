@@ -3,7 +3,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16915471.svg)](https://doi.org/10.5281/zenodo.16915471)
 
 This repository contains source code and scripts for reproducing key results
-from the cache_ext paper (SOSP 2025) for the purposes of artifact
+from the [cache_ext paper](https://dl.acm.org/doi/10.1145/3731569.3764820) (SOSP 2025) for the purposes of artifact
 evaluation.
 
 If using cache_ext, please cite the reference [below](#citation).
