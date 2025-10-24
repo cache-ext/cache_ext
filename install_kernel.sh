@@ -26,7 +26,7 @@ make distclean
 echo "Configuring kernel..."
 make olddefconfig
 
-# Ignore 'yes' exist status
+# Ignore 'yes' exit status
 { yes '' || true;} | make localmodconfig
 
 scripts/config --set-str LOCALVERSION "-cache-ext"
