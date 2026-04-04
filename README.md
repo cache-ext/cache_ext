@@ -71,9 +71,10 @@ Some of the remaining components can only be compiled on the cache_ext kernel,
 so you must wait for the system to reboot and then log back in.
 
 Then, run the following command to download the various datasets used.
-The datasets are stored on a public Google Cloud bucket. These will be
-set up on Cloudlab. The download step may take a while, as the datasets are
-hundreds of gigabytes in size.
+The datasets are stored as compressed archives (`.tar.zst`) on a public Google
+Cloud bucket. These will be set up on Cloudlab. The download step may take a
+while, as the datasets are hundreds of gigabytes in size (approximately 75GB
+compressed).
 
 ```sh
 cd /mydata/cache_ext

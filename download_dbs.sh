@@ -3,7 +3,7 @@ set -eu -o pipefail
 
 echo "Installing dependencies..."
 sudo apt-get update
-sudo apt-get install -y rclone
+sudo apt-get install -y zstd
 
 SCRIPT_PATH=$(realpath $0)
 BASE_DIR=$(dirname $SCRIPT_PATH)
@@ -11,22 +11,33 @@ BASE_DIR=$(dirname $SCRIPT_PATH)
 DB_PATH=$(realpath $BASE_DIR/..)
 
 BUCKET="cache-ext-artifact-data"
+GCS_URL="https://storage.googleapis.com/${BUCKET}"
 
 cd "$DB_PATH"
 
 echo "Downloading databases from GCS (bucket: ${BUCKET})..."
 
+download_and_extract() {
+	local name=$1
+	echo "Downloading ${name}.tar.zst..."
+	if ! curl -fL --progress-bar "${GCS_URL}/${name}.tar.zst" -o "${name}.tar.zst"; then
+		echo "ERROR: Failed to download ${name}.tar.zst"
+		echo "The download URL may have changed. Please check for an updated version of this script at:"
+		echo "  https://github.com/cache-ext/cache_ext"
+		exit 1
+	fi
+	echo "Extracting ${name}.tar.zst..."
+	tar --use-compress-program=zstd -xf "${name}.tar.zst"
+	rm "${name}.tar.zst"
+}
 
 echo "Downloading LevelDB database..."
-rclone copy --progress --transfers 64 --checkers 64 --gcs-anonymous :gcs:${BUCKET}/leveldb "${DB_PATH}/leveldb/"
-rclone check --progress --transfers 64 --checkers 64 --gcs-anonymous :gcs:${BUCKET}/leveldb "${DB_PATH}/leveldb/"
+download_and_extract "leveldb"
 
 echo "Downloading Twitter trace metadata..."
-rclone copy --progress --transfers 64 --checkers 64 --gcs-anonymous :gcs:${BUCKET}/twitter-traces "${DB_PATH}/twitter-traces/"
-rclone check --progress --transfers 64 --checkers 64 --gcs-anonymous :gcs:${BUCKET}/twitter-traces "${DB_PATH}/twitter-traces/"
+download_and_extract "twitter-traces"
 
 for cluster in 17 18 24 34 52; do
 	echo "Downloading LevelDB Twitter cluster $cluster database..."
-	rclone copy --progress --transfers 64 --checkers 64 --gcs-anonymous :gcs:${BUCKET}/leveldb_twitter_cluster${cluster}_db "${DB_PATH}/leveldb_twitter_cluster${cluster}_db/"
-	rclone check --progress --transfers 64 --checkers 64 --gcs-anonymous :gcs:${BUCKET}/leveldb_twitter_cluster${cluster}_db "${DB_PATH}/leveldb_twitter_cluster${cluster}_db/"
+	download_and_extract "leveldb_twitter_cluster${cluster}_db"
 done
