@@ -6,7 +6,7 @@ This repository contains source code and scripts for reproducing key results
 from the [cache_ext paper](https://dl.acm.org/doi/10.1145/3731569.3764820) (SOSP 2025) for the purposes of artifact
 evaluation.
 
-If using cache_ext, please cite the reference [below](#citation).
+If using cache_ext, please cite the references [below](#citation).
 
 We use a Cloudlab instance of type c6525-25g running Ubuntu 22.04, with a
 maxed out temporary disk.
@@ -141,22 +141,38 @@ The figures will be saved as PDFs in a created `figures/` directory.
 
 ## Citation
 
-If using cache_ext, please include the following citation:
+If using cache_ext, please cite the following papers:
 
 ```bibtex
-@inproceedings{cacheext,
-author = {Zussman, Tal and Zarkadas, Ioannis and Carin, Jeremy and Cheng, Andrew and Franke, Hubertus and Pfefferle, Jonas and Cidon, Asaf},
-title = {cache_ext: Customizing the Page Cache with eBPF},
-year = {2025},
-isbn = {9798400718700},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-url = {https://doi.org/10.1145/3731569.3764820},
-doi = {10.1145/3731569.3764820},
-pages = {462–478},
-numpages = {17},
-keywords = {operating systems, eBPF, page cache},
-location = {Lotte Hotel World, Seoul, Republic of Korea},
-series = {SOSP '25}
+@inproceedings{zussman2025cacheext,
+  author    = {Zussman, Tal and Zarkadas, Ioannis and Carin, Jeremy and Cheng, Andrew and Franke, Hubertus and Pfefferle, Jonas and Cidon, Asaf},
+  title     = {cache\_ext: Customizing the Page Cache with {eBPF}},
+  year      = {2025},
+  isbn      = {9798400718700},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/3731569.3764820},
+  doi       = {10.1145/3731569.3764820},
+  booktitle = {Proceedings of the ACM SIGOPS 31st Symposium on Operating Systems Principles},
+  pages     = {462–478},
+  numpages  = {17},
+  keywords  = {operating systems, eBPF, page cache},
+  location  = {Seoul, Republic of Korea},
+  series    = {SOSP '25}
+}
+
+@article{zussman2026cacheext,
+  author    = {Zussman, Tal and Zarkadas, Ioannis and Carin, Jeremy and Cheng, Andrew and Franke, Hubertus and Pfefferle, Jonas and Cidon, Asaf},
+  title     = {cache\_ext: Customizing and Tracing the Page Cache with {eBPF}},
+  year      = {2026},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  issn      = {0734-2071},
+  url       = {https://doi.org/10.1145/3819062},
+  doi       = {10.1145/3819062},
+  note      = {Just Accepted},
+  journal   = {ACM Trans. Comput. Syst.},
+  month     = jun,
+  keywords  = {Operating systems, eBPF, page cache}
 }
 ```
